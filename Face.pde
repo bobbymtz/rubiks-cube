@@ -1,74 +1,75 @@
-// bobbymtz
-// 05/22/2022
-
+// The face class is used to represent the cubies faces with color
 class Face
 {
-  PVector normal;
+  int x, y, z;
   color c;
   
-  Face(PVector normal, color c)
+  // Each face is centered along an axis and has a color
+  Face(int x, int y, int z, color c)
   {
-    this.normal = normal;
+    this.x = x;
+    this.y = y;
+    this.z = z;
     this.c = c;
   }
   
+  // The same rotation as for a cubie
   void rotate(char axis, int direction)
   {
-    int x, y;
+    PMatrix2D plane = new PMatrix2D();
+    
     if (axis == 'x')
     {
-      x = round(normal.z);
-      y = round(normal.y);
-        
-      int xprime = round(x * cos(HALF_PI * direction) - y * sin(HALF_PI * direction));
-      int yprime = round(x * sin(HALF_PI * direction) + y * cos(HALF_PI * direction));
-        
-      normal = new PVector(normal.x, yprime, xprime);
+      plane.rotate(-direction * PI/2);
+      plane.translate(z, y);
+      
+      z = round(plane.m02);
+      y = round(plane.m12);
+      
     }
     else if (axis == 'y')
     {
-      x = round(normal.x);
-      y = round(normal.z);
-        
-      int xprime = round(x * cos(HALF_PI * direction) - y * sin(HALF_PI * direction));
-      int yprime = round(x * sin(HALF_PI * direction) + y * cos(HALF_PI * direction));
-        
-      normal = new PVector(xprime, normal.y, yprime);
+      plane.rotate(-direction * PI/2);
+      plane.translate(x, z);
+      x = round(plane.m02);
+      z = round(plane.m12);
     }
     else
     {
-      x = round(normal.x);
-      y = round(normal.y);
-        
-      int xprime = round(x * cos(HALF_PI * direction) - y * sin(HALF_PI * direction));
-      int yprime = round(x * sin(HALF_PI * direction) + y * cos(HALF_PI * direction));
-        
-      normal = new PVector(xprime, yprime, normal.z);
-    }    
+      plane.rotate(direction * PI/2);
+      plane.translate(x, y);
+      x = round(plane.m02);
+      y = round(plane.m12);
+    }
+    
   }
   
   void show()
   {
     pushMatrix();
-    translate(0.5 * normal.x, 0.5 * normal.y, 0.5 * normal.z);
+    translate(0.5 * x, 0.5 * y, 0.5 * z);
+  
     rectMode(CENTER);
-    strokeWeight(0.1);
+    strokeWeight(0.5);
+    stroke(0);
     fill(c);
     
-    if(abs(round(normal.x)) == 1)
+    // Rotation depends on the axis
+    if(abs(x) == 1)
     {
-      rotateY(PI / 2);
+      rotateY(PI/2);
       square(0, 0, 1);
     }
-    else if (abs(round(normal.y)) == 1)
+    else if (abs(y) == 1)
     {
-      rotateX(PI / 2);
+      rotateX(PI/2);
       square(0, 0, 1);
     }
     else
     {
       square(0, 0, 1);
     }
+    
     popMatrix();
   }
 }

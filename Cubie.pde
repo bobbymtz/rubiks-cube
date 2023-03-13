@@ -1,65 +1,57 @@
-// bobbymtz
-// 05/22/2022
-
-// Cubie is an individual cube in a Rubiks cube
+// Represents a single cubie
 class Cubie
 {
-  // This is a 3D vector to hold the center of the cube
-  PVector center;
-  
+  int x, y, z;
   Face[] faces = new Face[6];
-
-  Cubie(PVector center)
+  
+  // Each cubie is centered at a point and has a collection of 6 faces
+  Cubie(int x, int y, int z)
   {
-    this.center = center;
-    // Left face
-    faces[0] = new Face(new PVector(-1, 0, 0), L);
-    // Right face
-    faces[1] = new Face(new PVector(1, 0, 0), R);
-    // Top face
-    faces[2] = new Face(new PVector(0, -1, 0), U);
-    // Bottom face
-    faces[3] = new Face(new PVector(0, 1, 0), D);
-    // Front face
-    faces[4] = new Face(new PVector(0, 0, 1), F);
-    // Back face
-    faces[5] = new Face(new PVector(0, 0, -1), B);
+    this.x = x;
+    this.y = y;
+    this.z = z;
     
+    // left face
+    faces[0] = new Face(-1, 0, 0, L);
+    // right face
+    faces[1] = new Face(1, 0, 0, R);
+    // up face
+    faces[2] = new Face(0, -1, 0, U);
+    // down face
+    faces[3] = new Face(0, 1, 0, D);
+    // back face
+    faces[4] = new Face(0, 0, -1, B);
+    // front face
+    faces[5] = new Face(0, 0, 1, F);
   }
   
+  // To rotate a cubie 90 degrees the following matrix math is used
   void rotate(char axis, int direction)
   {
-    int x, y;
+    PMatrix2D plane = new PMatrix2D();
     
     if (axis == 'x')
     {
-      x = round(center.z);
-      y = round(center.y);
-        
-      int xprime = round(x * cos(HALF_PI * direction) - y * sin(HALF_PI * direction));
-      int yprime = round(x * sin(HALF_PI * direction) + y * cos(HALF_PI * direction));
-        
-      center = new PVector(center.x, yprime, xprime);
+      plane.rotate(-direction * PI/2);
+      plane.translate(z, y);
+      z = round(plane.m02);
+      y = round(plane.m12);
+      
+      
     }
     else if (axis == 'y')
     {
-      x = round(center.x);
-      y = round(center.z);
-        
-      int xprime = round(x * cos(HALF_PI * direction) - y * sin(HALF_PI * direction));
-      int yprime = round(x * sin(HALF_PI * direction) + y * cos(HALF_PI * direction));
-        
-      center = new PVector(xprime, center.y, yprime);
+      plane.rotate(-direction * PI/2);
+      plane.translate(x, z);
+      x = round(plane.m02);
+      z = round(plane.m12);
     }
     else
     {
-      x = round(center.x);
-      y = round(center.y);
-        
-      int xprime = round(x * cos(HALF_PI * direction) - y * sin(HALF_PI * direction));
-      int yprime = round(x * sin(HALF_PI * direction) + y * cos(HALF_PI * direction));
-        
-      center = new PVector(xprime, yprime, center.z);
+      plane.rotate(direction * PI/2);
+      plane.translate(x, y);
+      x = round(plane.m02);
+      y = round(plane.m12);
     }
     
     for(int i = 0; i< faces.length; i++)
@@ -71,7 +63,8 @@ class Cubie
   void show()
   {
     pushMatrix();
-    translate(center.x, center.y, center.z);
+    translate(x, y, z);
+    strokeWeight(0.1);
     
     for (int i = 0; i < faces.length; i++)
     {
@@ -79,5 +72,6 @@ class Cubie
     }
     
     popMatrix();
+    
   }
 }
